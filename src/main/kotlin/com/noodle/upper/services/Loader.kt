@@ -36,6 +36,5 @@ private object LoaderCache {
     fun expectedOf(key: String): Int =
             _expected.getOrPut(key){0}
     infix fun String.expects(expected: Int): Int? = _expected.put(this, expected)
-//    private val _cache = mutableMapOf<String, MutableList<Any>>()
     private val _expected = mutableMapOf<String, Int>()
 }

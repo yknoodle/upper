@@ -22,12 +22,9 @@ import org.springframework.transaction.annotation.Transactional
 class UploadService(@Autowired val invoiceRepository: ReactiveInvoiceRepository) {
     @FlowPreview
     fun upload(invoices: FilePart): Flow<ServerSentEvent<Map<String, Float>>> = flow {
-        val invoiceCsvFlow: Flow<Invoice> = invoices.asFlow().map {
-            Invoice(null, it.invoiceNo, it.stockCode, it.description, it.quantity, it.invoiceDate, it.unitPrice, it.customerId, it.country )
-        }
+        val invoiceCsvFlow: Flow<Invoice> = invoices.asFlow<InvoiceCsv>().map { it.asInvoice() }
         val count = invoiceCsvFlow.toList().size
-        val saveFlow: Flow<String> = invoiceCsvFlow
-                .chunked()
+        val saveFlow: Flow<String> = invoiceCsvFlow.chunked()
                 .flatMapConcat{invoiceRepository.insert(it).asFlow()}
                 .map{it.id?:"unknown"}
         FlowHelper.track({saveFlow}, count)
@@ -37,8 +34,8 @@ class UploadService(@Autowired val invoiceRepository: ReactiveInvoiceRepository)
     }
     @FlowPreview
     @Transactional
-    fun uploadCached(invoices: FilePart): String = load( suspend {invoices.asFlow().toList().size}) {
-        invoices.asFlow()
+    fun uploadCached(invoices: FilePart): String = load( suspend {invoices.asFlow<Invoice>().toList().size}) {
+        invoices.asFlow<InvoiceCsv>()
                 .map{ it.asInvoice() }
                 .chunked()
                 .flatMapConcat{invoiceRepository.insert(it).asFlow()}
