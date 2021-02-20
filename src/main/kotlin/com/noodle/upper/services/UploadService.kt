@@ -25,8 +25,8 @@ class UploadService(@Autowired val invoiceRepository: ReactiveInvoiceRepository)
         }
         val count = invoiceCsvFlow.toList().size
         val saveFlow: Flow<String> = invoiceCsvFlow
-                .chunked(chunkSize)
-                .flatMapConcat{invoiceRepository.saveAll(it).asFlow()}
+                .chunked(chunkSize).buffer()
+                .flatMapConcat{invoiceRepository.insert(it).asFlow()}
                 .map{it.id?:"unknown"}
         FlowHelper.track({saveFlow}, count)
                 .distinctUntilChangedBy{it.base100()}
