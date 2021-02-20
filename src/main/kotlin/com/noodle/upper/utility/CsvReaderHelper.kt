@@ -11,4 +11,5 @@ object CsvReaderHelper {
         return CsvToBeanBuilder<T>(CSVReader(InputStreamReader(inputStream)))
                 .withType(T::class.java).build()
     }
+    inline fun <reified T> InputStream.asCsvToBean(): CsvToBean<T> = getCSVReader(this)
 }
