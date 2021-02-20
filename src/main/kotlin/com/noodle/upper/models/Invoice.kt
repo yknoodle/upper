@@ -5,6 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
 data class Invoice(
+        val id: String? = null,
         @TextIndexed
         val invoiceNo: String? = null,
         @TextIndexed
