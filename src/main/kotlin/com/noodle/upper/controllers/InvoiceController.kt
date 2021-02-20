@@ -3,6 +3,7 @@ package com.noodle.upper.controllers
 import com.noodle.upper.models.Invoice
 import com.noodle.upper.models.Tracked
 import com.noodle.upper.services.ListService
+import com.noodle.upper.services.Loader
 import com.noodle.upper.services.SearchService
 import com.noodle.upper.services.UploadService
 import kotlinx.coroutines.FlowPreview
@@ -43,4 +44,12 @@ class InvoiceController(
             Flow<ServerSentEvent<Tracked<Invoice>>> =
             searchService.search(searchKeys)
                     .onEach{println(it)}
+    @FlowPreview
+    @PostMapping("/async", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun uploadAsync(
+            @RequestPart("invoiceCsv") invoiceCsv: FilePart): String =
+            uploadService.uploadCached(invoiceCsv)
+    @GetMapping("/async")
+    fun uploadCompletion(@RequestParam("cacheUUID") cacheUUID: String): Map<String, Int> =
+            Loader.completion(cacheUUID)
 }
