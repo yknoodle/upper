@@ -16,7 +16,7 @@ object FlowHelper {
                     Tracked(currentRetrieved, expected, it)
                 }
     }
-    fun <T> Flow<T>.chunked(maxSize: Int):Flow<List<T>> = flow {
+    fun <T> Flow<T>.chunked(maxSize: Int=5000):Flow<List<T>> = flow {
         val list: List<T> = toList()
         list.chunked(maxSize).forEach {emit(it)}
     }
