@@ -11,4 +11,5 @@ interface ReactiveInvoiceRepository: ReactiveMongoRepository<Invoice, String>{
     fun countAllBy(criteria: TextCriteria): Mono<Int>
     fun findAllBy(criteria: TextCriteria): Flux<Invoice>
     fun findAllBy(pageable: Pageable): Flux<Invoice>
+    fun countAllByUploadId(uploadId: String): Mono<Int>
 }

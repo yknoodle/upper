@@ -3,12 +3,12 @@ package com.noodle.upper.controllers
 import com.noodle.upper.models.Invoice
 import com.noodle.upper.models.Tracked
 import com.noodle.upper.services.ListService
-import com.noodle.upper.services.Loader
 import com.noodle.upper.services.SearchService
 import com.noodle.upper.services.UploadService
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.single
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.codec.ServerSentEvent
@@ -41,15 +41,15 @@ class InvoiceController(
     @GetMapping(consumes = [MediaType.TEXT_PLAIN_VALUE])
     fun search(
             @RequestParam searchKeys: String):
-            Flow<ServerSentEvent<Tracked<Invoice>>> =
-            searchService.search(searchKeys)
+            Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
+            searchService.searchChunked(searchKeys)
                     .onEach{println(it)}
     @FlowPreview
     @PostMapping("/async", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun uploadAsync(
             @RequestPart("invoiceCsv") invoiceCsv: FilePart): String =
-            uploadService.uploadCached(invoiceCsv)
+            uploadService.uploadDbCached(invoiceCsv)
     @GetMapping("/async")
-    fun uploadCompletion(@RequestParam("cacheUUID") cacheUUID: String): Map<String, Int> =
-            Loader.completion(cacheUUID)
+    suspend fun uploadCompletion(@RequestParam("cacheUUID") cacheUUID: String): Map<String, Int> =
+            uploadService.uploadProgress(cacheUUID).single()
 }

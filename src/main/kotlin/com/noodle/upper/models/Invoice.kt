@@ -21,6 +21,7 @@ data class Invoice(
         val customerId: String? = null,
         @TextIndexed
         val country: String? = null,
+        val uploadId: String? = null
 ){
 
 
