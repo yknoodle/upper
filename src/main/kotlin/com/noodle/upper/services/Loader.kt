@@ -3,12 +3,12 @@ package com.noodle.upper.services
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.noodle.upper.services.LoaderCache.expects
+import com.noodle.upper.utility.Strings.uuid
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.util.*
 
 object Loader{
     fun completion(key: String): Map<String, Int> =
@@ -26,7 +26,6 @@ object Loader{
         return requestId
     }
 }
-fun uuid() = UUID.randomUUID().toString()
 private object LoaderCache {
     const val maximumSize: Long = 3 //make configurable
     val _cache: Cache<String, MutableList<Any>> = CacheBuilder.newBuilder()
