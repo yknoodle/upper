@@ -59,9 +59,7 @@ class UploadService(
                     .map { it.id ?: "unknown" }
                     .onCompletion {
                         uploadRequestRepository.findById(uuid).asFlow()
-                                .onEach{println("test: $it")}
                                 .map{SubmissionRequest(it.id, it.count, true)}
-                                .onEach{println("test: $it")}
                                 .flatMapConcat{uploadRequestRepository.save(it).asFlow()}.collect()
                     }
                     .collect()
@@ -69,11 +67,11 @@ class UploadService(
         return uuid
     }
 
-    fun uploadProgress(uuid: String): Flow<Map<String, Int>> {
+    fun uploadProgress(uuid: String): Flow<SubmissionState> {
         val uploaded: Flow<Int> = invoiceRepository.countAllByUploadId(uuid).asFlow()
         val submissionRequest: Flow<SubmissionRequest> = uploadRequestRepository.findById(uuid).asFlow()
         return uploaded.zip(submissionRequest) { uploadedInt, uploadReq ->
-            mapOf("loaded" to uploadedInt, "total" to uploadReq.count)
+            SubmissionState(uploadedInt, uploadReq.count, uploadReq.complete)
         }
     }
 

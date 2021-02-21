@@ -4,12 +4,14 @@ import com.noodle.upper.models.Invoice
 import com.noodle.upper.models.Tracked
 import com.noodle.upper.services.ListService
 import com.noodle.upper.services.SearchService
+import com.noodle.upper.services.SubmissionState
 import com.noodle.upper.services.UploadService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
+import org.springframework.http.ResponseEntity
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.*
@@ -27,8 +29,9 @@ class InvoiceController(
             @RequestPart("invoiceCsv") invoiceCsv: FilePart): String =
             uploadService.uploadDbCached(invoiceCsv)
     @GetMapping("/submission")
-    suspend fun progress(@RequestParam("uuid") cacheUUID: String): Map<String, Int> =
-            uploadService.uploadProgress(cacheUUID).single()
+    suspend fun progress(@RequestParam("uuid") cacheUUID: String):
+            ResponseEntity<SubmissionState> =
+        uploadService.uploadProgress(cacheUUID).map{ResponseEntity.ok(it)}.first()
     @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping("/{pageNumber}")
     fun pages(
