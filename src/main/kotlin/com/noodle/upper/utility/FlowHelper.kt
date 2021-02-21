@@ -15,7 +15,6 @@ object FlowHelper {
     }
     fun <T> Flow<T>.chunks(maxSize: Int=5000):Flow<List<T>> = flow {
         val list: List<T> = toList()
-        onEach{println(it)}.collect()
         list.chunked(maxSize).forEach {emit(it)}
     }
     fun <T> Flow<T>.hotChunks(maxSize: Int = 5000):Flow<List<T>> = flow {
@@ -26,6 +25,8 @@ object FlowHelper {
                 emit(list)
                 list.clear()
             }
-        }.onCompletion { emit(list) }.collect()
+        }
+                .onCompletion { emit(list) }
+                .collect()
     }
 }

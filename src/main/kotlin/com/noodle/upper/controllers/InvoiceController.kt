@@ -7,6 +7,7 @@ import com.noodle.upper.services.SearchService
 import com.noodle.upper.services.UploadService
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.single
 import org.springframework.beans.factory.annotation.Autowired
@@ -39,10 +40,11 @@ class InvoiceController(
                     .onEach{println(it)}
     @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping(consumes = [MediaType.TEXT_PLAIN_VALUE])
-    fun search(
+    suspend fun search(
             @RequestParam searchKeys: String):
             Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
             searchService.searchChunked(searchKeys)
+                    .catch{println(it)}
                     .onEach{println(it)}
     @FlowPreview
     @PostMapping("/async", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
