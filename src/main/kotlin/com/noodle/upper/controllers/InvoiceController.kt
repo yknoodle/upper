@@ -22,16 +22,16 @@ class InvoiceController(
         @Autowired val searchService: SearchService
 ) {
     @FlowPreview
-    @PostMapping("/async", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun uploadAsync(
+    @PostMapping("/submission", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun creation(
             @RequestPart("invoiceCsv") invoiceCsv: FilePart): String =
             uploadService.uploadDbCached(invoiceCsv)
-    @GetMapping("/async")
-    suspend fun uploadCompletion(@RequestParam("uuid") cacheUUID: String): Map<String, Int> =
+    @GetMapping("/submission")
+    suspend fun progress(@RequestParam("uuid") cacheUUID: String): Map<String, Int> =
             uploadService.uploadProgress(cacheUUID).single()
     @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping("/{pageNumber}")
-    fun list(
+    fun pages(
             @PathVariable("pageNumber") pageNumber: Int,
             @RequestParam("pageSize") pageSize: Int):
             Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
@@ -42,7 +42,7 @@ class InvoiceController(
     @ExperimentalCoroutinesApi
     @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping
-    suspend fun searchAll(
+    suspend fun search(
             @RequestParam("searchTerm") words: String):
             Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
             searchService.searchPhrase(words)
