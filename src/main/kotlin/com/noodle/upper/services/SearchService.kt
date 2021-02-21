@@ -2,6 +2,7 @@ package com.noodle.upper.services
 
 import com.noodle.upper.models.Invoice
 import com.noodle.upper.models.Tracked
+import com.noodle.upper.models.mergeTracked
 import com.noodle.upper.repositories.ReactiveInvoiceRepository
 import com.noodle.upper.utility.FlowHelper.hotChunks
 import com.noodle.upper.utility.FlowHelper.track
@@ -99,13 +100,5 @@ class SearchService(@Autowired val invoiceRepository: ReactiveInvoiceRepository)
                 emptyList()
             }
 
-    suspend fun <T> Flow<List<Tracked<T>>>.mergeTracked(): Flow<Tracked<List<T>>> {
-        return this.map {
-            Tracked(
-                    it.maxOf { tracked -> tracked.fetched },
-                    it[0].total,
-                    it.fold(listOf<T>()) { acc, cur -> if (cur.entity != null) acc + (cur.entity) else acc }
-            )
-        }
-    }
+
 }
