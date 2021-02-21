@@ -48,11 +48,12 @@ class UploadService(
 
     @FlowPreview
     @Transactional
-    fun uploadDbCached(invoices: FilePart): String {
+    suspend fun uploadDbCached(invoices: FilePart): SubmissionRequest {
         val uuid: String = uuid()
         val invoiceFlow = invoices.asFlow<InvoiceCsv>().map { it.asInvoice(uuid) }
+        val submissionRequest = SubmissionRequest(uuid, invoiceFlow.count())
         GlobalScope.launch {
-            uploadRequestRepository.insert(SubmissionRequest(uuid, invoiceFlow.count()))
+            uploadRequestRepository.insert(submissionRequest)
                     .asFlow().collect()
             invoiceFlow.hotChunks()
                     .flatMapConcat { invoiceRepository.insert(it).asFlow() }
@@ -64,7 +65,7 @@ class UploadService(
                     }
                     .collect()
         }
-        return uuid
+        return submissionRequest
     }
 
     fun uploadProgress(uuid: String): Flow<SubmissionState> {
