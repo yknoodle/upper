@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.reactive.asFlow
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.query.TextCriteria
 import org.springframework.stereotype.Component
 
@@ -34,9 +35,10 @@ class SearchService(@Autowired val invoiceRepository: ReactiveInvoiceRepository)
         val chunkSize = 1000
         val stringList: List<String> = string.splitToSequence(" ").toList()
         val stringArray: Array<String> = stringList.toTypedArray()
-        val criteria: TextCriteria = TextCriteria.forDefaultLanguage().matchingPhrase("\"$string\"").matchingAny(*stringArray)
+        val sort: Sort = Sort.by("score")
+        val criteria: TextCriteria = TextCriteria.forDefaultLanguage().matchingAny(*stringArray).matchingPhrase("\"$string\"")
         val count: Int = invoiceRepository.countAllBy(criteria).asFlow().first()
-        return track({invoiceRepository.findAllBy(criteria).asFlow()}, count)
+        return track({invoiceRepository.findAllBy(criteria, sort).asFlow()}, count)
                 .hotChunks(chunkSize)
                 .mergeTracked()
     }

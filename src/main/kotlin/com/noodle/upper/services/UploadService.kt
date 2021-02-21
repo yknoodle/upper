@@ -28,38 +28,40 @@ class UploadService(
         val invoiceCsvFlow: Flow<Invoice> = invoices.asFlow<InvoiceCsv>().map { it.asInvoice() }
         val count = invoiceCsvFlow.toList().size
         val saveFlow: Flow<String> = invoiceCsvFlow.hotChunks()
-                .flatMapConcat{invoiceRepository.insert(it).asFlow()}
-                .map{it.id?:"unknown"}
-        FlowHelper.track({saveFlow}, count)
-                .distinctUntilChangedBy{it.base100()}
-                .onEach{ emit(ServerSentEvent.builder(mapOf("uploaded" to it.completion())).build())}
+                .flatMapConcat { invoiceRepository.insert(it).asFlow() }
+                .map { it.id ?: "unknown" }
+        FlowHelper.track({ saveFlow }, count)
+                .distinctUntilChangedBy { it.base100() }
+                .onEach { emit(ServerSentEvent.builder(mapOf("uploaded" to it.completion())).build()) }
                 .collect()
     }
+
     @FlowPreview
     @Transactional
-    fun uploadCached(invoices: FilePart): String = load( suspend {invoices.asFlow<Invoice>().toList().size}) {
+    fun uploadCached(invoices: FilePart): String = load(suspend { invoices.asFlow<Invoice>().toList().size }) {
         invoices.asFlow<InvoiceCsv>()
-                .map{ it.asInvoice() }
+                .map { it.asInvoice() }
                 .hotChunks()
-                .flatMapConcat{invoiceRepository.insert(it).asFlow()}
-                .map{it.id?:"unknown"}
+                .flatMapConcat { invoiceRepository.insert(it).asFlow() }
+                .map { it.id ?: "unknown" }
     }
 
     @FlowPreview
     @Transactional
     fun uploadDbCached(invoices: FilePart): String {
         val uuid: String = uuid()
-        val invoiceFlow = invoices.asFlow<InvoiceCsv>().map{it.asInvoice(uuid)}
-        GlobalScope.launch{
+        val invoiceFlow = invoices.asFlow<InvoiceCsv>().map { it.asInvoice(uuid) }
+        GlobalScope.launch {
             uploadRequestRepository.insert(UploadRequest(uuid, invoiceFlow.count()))
                     .asFlow().collect()
             invoiceFlow.hotChunks()
-                    .flatMapConcat{invoiceRepository.insert(it).asFlow()}
-                    .map{it.id?:"unknown"}
+                    .flatMapConcat { invoiceRepository.insert(it).asFlow() }
+                    .map { it.id ?: "unknown" }
                     .collect()
         }
         return uuid
     }
+
     fun uploadProgress(uuid: String): Flow<Map<String, Int>> {
         val uploaded: Flow<Int> = invoiceRepository.countAllByUploadId(uuid).asFlow()
         val uploadRequest: Flow<UploadRequest> = uploadRequestRepository.findById(uuid).asFlow()
@@ -67,16 +69,17 @@ class UploadService(
             mapOf("loaded" to uploadedInt, "total" to uploadReq.count)
         }
     }
+
     fun InvoiceCsv.asInvoice(requestId: String? = null): Invoice =
-            Invoice(null,
-                    this.invoiceNo,
-                    this.stockCode,
-                    this.description,
-                    this.quantity,
-                    this.invoiceDate,
-                    this.unitPrice,
-                    this.customerId,
-                    this.country,
-                    requestId
+            Invoice(
+                    invoiceNo = this.invoiceNo,
+                    stockCode = this.stockCode,
+                    description = this.description,
+                    quantity = this.quantity,
+                    invoiceDate = this.invoiceDate,
+                    unitPrice = this.unitPrice,
+                    customerId = this.customerId,
+                    country = this.country,
+                    uploadId = requestId
             )
 }
