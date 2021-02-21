@@ -22,6 +22,7 @@ class InvoiceController(
         @Autowired val searchService: SearchService
 ) {
     @FlowPreview
+    @Deprecated("Error prone", replaceWith = ReplaceWith("uploadAsync"))
     @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun upload(
             @RequestPart("invoiceCsv") invoiceCsv: FilePart):
@@ -33,9 +34,10 @@ class InvoiceController(
     fun list(
             @PathVariable("pageNumber") pageNumber: Int,
             @RequestParam("pageSize") pageSize: Int):
-            Flow<ServerSentEvent<Tracked<Invoice>>> =
-            listService.list(pageNumber, pageSize)
-                    .onEach{println(it)}
+            Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
+            listService.listChunked(pageNumber, pageSize)
+                    .onEach{println("sending ${it.entity?.size}")}
+                    .map { ServerSentEvent.builder(it).build() }
     @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping("/words")
     suspend fun searchString(
@@ -49,7 +51,7 @@ class InvoiceController(
     @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping
     suspend fun searchAll(
-            @RequestParam("words") words: String):
+            @RequestParam("searchTerm") words: String):
             Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
             searchService.searchPhrase(words)
                     .onEach{println("sending ${it.entity?.size}")}
@@ -61,6 +63,6 @@ class InvoiceController(
             @RequestPart("invoiceCsv") invoiceCsv: FilePart): String =
             uploadService.uploadDbCached(invoiceCsv)
     @GetMapping("/async")
-    suspend fun uploadCompletion(@RequestParam("cacheUUID") cacheUUID: String): Map<String, Int> =
+    suspend fun uploadCompletion(@RequestParam("uuid") cacheUUID: String): Map<String, Int> =
             uploadService.uploadProgress(cacheUUID).single()
 }
