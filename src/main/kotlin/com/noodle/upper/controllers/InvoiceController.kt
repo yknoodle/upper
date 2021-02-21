@@ -6,10 +6,7 @@ import com.noodle.upper.services.ListService
 import com.noodle.upper.services.SearchService
 import com.noodle.upper.services.UploadService
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.single
+import kotlinx.coroutines.flow.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType
 import org.springframework.http.codec.ServerSentEvent
@@ -31,21 +28,29 @@ class InvoiceController(
             uploadService.upload(invoiceCsv)
                     .onEach{println(it)}
     @CrossOrigin(origins = ["http://localhost:3000"])
-    @GetMapping
+    @GetMapping("/{pageNumber}")
     fun list(
-            @RequestParam("pageNumber") pageNumber: Int,
+            @PathVariable("pageNumber") pageNumber: Int,
             @RequestParam("pageSize") pageSize: Int):
             Flow<ServerSentEvent<Tracked<Invoice>>> =
             listService.list(pageNumber, pageSize)
                     .onEach{println(it)}
     @CrossOrigin(origins = ["http://localhost:3000"])
-    @GetMapping(consumes = [MediaType.TEXT_PLAIN_VALUE])
-    suspend fun search(
-            @RequestParam searchKeys: String):
+    @GetMapping("/words")
+    suspend fun searchString(
+            @RequestParam words: String):
             Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
-            searchService.searchChunked(searchKeys)
+            searchService.searchWords(words)
+                    .map{ServerSentEvent.builder(it).build()}
                     .catch{println(it)}
-                    .onEach{println(it)}
+    @CrossOrigin(origins = ["http://localhost:3000"])
+    @GetMapping
+    suspend fun searchAll(
+            @RequestParam("words") words: String):
+            Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
+            searchService.defaultSearch(words)
+                    .map{ServerSentEvent.builder(it).build()}
+                    .catch{println(it)}
     @FlowPreview
     @PostMapping("/async", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun uploadAsync(

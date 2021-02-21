@@ -11,47 +11,42 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.reactive.asFlow
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.query.TextCriteria
-import org.springframework.http.codec.ServerSentEvent
 import org.springframework.stereotype.Component
 
 @Component
-class SearchService(@Autowired val reactiveInvoiceRepository: ReactiveInvoiceRepository) {
-    //    fun search(strings: Array<String>): Flow<ServerSentEvent<Tracked<Invoice>>> = flow {
+class SearchService(@Autowired val invoiceRepository: ReactiveInvoiceRepository) {
     suspend fun search(strings: Array<String>): Flow<Tracked<Invoice>> {
         val criteria: TextCriteria = TextCriteria.forDefaultLanguage().matchingAny(*strings)
-        val count: Int = reactiveInvoiceRepository.countAllBy(criteria).asFlow().first()
-//        track({ reactiveInvoiceRepository.findAllBy(criteria).asFlow() }, count)
-        return track({ reactiveInvoiceRepository.findAllBy(criteria).asFlow() }, count)
-//                .onEach { emit(ServerSentEvent.builder<Tracked<Invoice>>(it).build()) }
+        val count: Int = invoiceRepository.countAllBy(criteria).asFlow().first()
+        return track({ invoiceRepository.findAllBy(criteria).asFlow() }, count)
     }
 
-    //    fun search(string: String): Flow<ServerSentEvent<Tracked<Invoice>>> = flow {
-    suspend fun search(string: String): Flow<Tracked<Invoice>> {
+    suspend fun searchWords(string: String): Flow<Tracked<List<Invoice>>> {
+        val chunkSize = 1000
         val stringList: List<String> = string.splitToSequence(" ").toList()
         val stringArray: Array<String> = stringList.toTypedArray()
-//        search(stringArray).onEach { emit(it) }.collect()
         return search(stringArray)
-    }
-
-//    fun searchChunked(string: String): Flow<ServerSentEvent<Tracked<List<Invoice>>>> {
-    suspend fun searchChunked(string: String): Flow<ServerSentEvent<Tracked<List<Invoice>>>> {
-        val chunkSize = 1000
-        return search(string)
                 .hotChunks(chunkSize)
-                .map {
-                    Tracked(
-                            it.maxOf { tracked -> tracked.fetched },
-                            it[0].total,
-                            it.fold(listOf<Invoice>()) {acc,cur -> acc+(cur.entity?:Invoice())}
-                    )
-//                    Tracked(
-//                            it.maxOf { sse -> sse.data()?.fetched ?: 0 },
-//                            it[0].data()?.total ?: 0,
-//                            it.fold(listOf<Invoice>()) { acc, cur ->
-//                                acc + mutableListOf(cur.data()?.entity ?: Invoice())
-//                            })
-                }
-                .map { ServerSentEvent.builder(it).build() }
-
+                .mergeTracked()
+    }
+    suspend fun defaultSearch(string: String): Flow<Tracked<List<Invoice>>> {
+        println(string)
+        val chunkSize = 1000
+        val stringList: List<String> = string.splitToSequence(" ").toList()
+        val stringArray: Array<String> = stringList.toTypedArray()
+        val criteria: TextCriteria = TextCriteria.forDefaultLanguage().matchingPhrase("\"$string\"").matchingAny(*stringArray)
+        val count: Int = invoiceRepository.countAllBy(criteria).asFlow().first()
+        return track({invoiceRepository.findAllBy(criteria).asFlow()}, count)
+                .hotChunks(chunkSize)
+                .mergeTracked()
+    }
+    suspend fun <T> Flow<List<Tracked<T>>>.mergeTracked(): Flow<Tracked<List<T>>> {
+        return this.map{
+            Tracked(
+                    it.maxOf { tracked -> tracked.fetched },
+                    it[0].total,
+                    it.fold(listOf<T>()) {acc,cur -> if (cur.entity != null)acc+(cur.entity) else acc}
+            )
+        }
     }
 }
