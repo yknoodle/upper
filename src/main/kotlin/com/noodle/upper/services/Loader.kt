@@ -3,7 +3,7 @@ package com.noodle.upper.services
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import com.noodle.upper.services.LoaderCache.expects
-import com.noodle.upper.utility.Strings.uuid
+import com.noodle.upper.utility.uuid
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect

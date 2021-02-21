@@ -7,12 +7,12 @@ import com.noodle.upper.repositories.ReactiveInvoiceRepository
 import com.noodle.upper.utility.FlowHelper.hotChunks
 import com.noodle.upper.utility.FlowHelper.track
 import com.noodle.upper.utility.FlowHelper.unique
+import com.noodle.upper.utility.phrases
+import com.noodle.upper.utility.words
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.reactive.asFlow
-import org.apache.commons.lang3.StringUtils.replaceEach
-import org.apache.commons.lang3.StringUtils.substringsBetween
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.query.TextCriteria
@@ -86,19 +86,6 @@ class SearchService(@Autowired val invoiceRepository: ReactiveInvoiceRepository)
                 .mergeTracked()
     }
 
-    private fun words(string: String): List<String> =
-            replaceEach(string,
-                    phrases(string).map { "\"$it\"" }.toTypedArray(),
-                    phrases(string).map { "" }.toTypedArray())
-                    .splitToSequence(" ")
-                    .filter { it.isNotEmpty() }.toList()
-
-    private fun phrases(string: String): List<String> =
-            try {
-                substringsBetween(string, "\"", "\"").toList()
-            } catch (ex: Exception) {
-                emptyList()
-            }
 
 
 }

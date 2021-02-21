@@ -7,7 +7,7 @@ import com.noodle.upper.services.Loader.load
 import com.noodle.upper.utility.FilePartHelper.asFlow
 import com.noodle.upper.utility.FlowHelper
 import com.noodle.upper.utility.FlowHelper.hotChunks
-import com.noodle.upper.utility.Strings.uuid
+import com.noodle.upper.utility.uuid
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.*
