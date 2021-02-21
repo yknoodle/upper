@@ -52,11 +52,18 @@ class UploadService(
         val uuid: String = uuid()
         val invoiceFlow = invoices.asFlow<InvoiceCsv>().map { it.asInvoice(uuid) }
         GlobalScope.launch {
-            uploadRequestRepository.insert(UploadRequest(uuid, invoiceFlow.count()))
+            uploadRequestRepository.insert(SubmissionRequest(uuid, invoiceFlow.count()))
                     .asFlow().collect()
             invoiceFlow.hotChunks()
                     .flatMapConcat { invoiceRepository.insert(it).asFlow() }
                     .map { it.id ?: "unknown" }
+                    .onCompletion {
+                        uploadRequestRepository.findById(uuid).asFlow()
+                                .onEach{println("test: $it")}
+                                .map{SubmissionRequest(it.id, it.count, true)}
+                                .onEach{println("test: $it")}
+                                .flatMapConcat{uploadRequestRepository.save(it).asFlow()}.collect()
+                    }
                     .collect()
         }
         return uuid
@@ -64,8 +71,8 @@ class UploadService(
 
     fun uploadProgress(uuid: String): Flow<Map<String, Int>> {
         val uploaded: Flow<Int> = invoiceRepository.countAllByUploadId(uuid).asFlow()
-        val uploadRequest: Flow<UploadRequest> = uploadRequestRepository.findById(uuid).asFlow()
-        return uploaded.zip(uploadRequest) { uploadedInt, uploadReq ->
+        val submissionRequest: Flow<SubmissionRequest> = uploadRequestRepository.findById(uuid).asFlow()
+        return uploaded.zip(submissionRequest) { uploadedInt, uploadReq ->
             mapOf("loaded" to uploadedInt, "total" to uploadReq.count)
         }
     }
