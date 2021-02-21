@@ -26,7 +26,7 @@ class UploadService(
     @FlowPreview
     fun upload(invoices: FilePart): Flow<ServerSentEvent<Map<String, Float>>> = flow {
         val invoiceCsvFlow: Flow<Invoice> = invoices.asFlow<InvoiceCsv>().map { it.asInvoice() }
-        val count = invoiceCsvFlow.toList().size
+        val count = invoiceCsvFlow.toList().size.toLong()
         val saveFlow: Flow<String> = invoiceCsvFlow.hotChunks()
                 .flatMapConcat { invoiceRepository.insert(it).asFlow() }
                 .map { it.id ?: "unknown" }

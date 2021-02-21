@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component
 @Component
 class ListService(@Autowired val reactiveInvoiceRepository: ReactiveInvoiceRepository) {
     fun list(pageable: Pageable): Flow<ServerSentEvent<Tracked<Invoice>>> = flow {
-        val count: Int = pageable.pageSize
+        val count: Long = pageable.pageSize.toLong()
         track({reactiveInvoiceRepository.findAllBy(pageable).asFlow()},count)
                 .onEach{emit(ServerSentEvent.builder<Tracked<Invoice>>(it).build())}.collect()
     }

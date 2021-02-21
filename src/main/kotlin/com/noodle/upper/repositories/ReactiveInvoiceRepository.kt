@@ -9,7 +9,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface ReactiveInvoiceRepository: ReactiveMongoRepository<Invoice, String>{
-    fun countAllBy(criteria: TextCriteria): Mono<Int>
+    fun countAllBy(criteria: TextCriteria): Mono<Long>
     fun findAllBy(criteria: TextCriteria, sort: Sort? = Sort.unsorted()): Flux<Invoice>
     fun findAllBy(pageable: Pageable): Flux<Invoice>
     fun countAllByUploadId(uploadId: String): Mono<Int>

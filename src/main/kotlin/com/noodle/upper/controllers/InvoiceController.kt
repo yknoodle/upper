@@ -5,6 +5,7 @@ import com.noodle.upper.models.Tracked
 import com.noodle.upper.services.ListService
 import com.noodle.upper.services.SearchService
 import com.noodle.upper.services.UploadService
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,12 +44,15 @@ class InvoiceController(
             searchService.searchWords(words)
                     .map{ServerSentEvent.builder(it).build()}
                     .catch{println(it)}
+    @FlowPreview
+    @ExperimentalCoroutinesApi
     @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping
     suspend fun searchAll(
             @RequestParam("words") words: String):
             Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
-            searchService.defaultSearch(words)
+            searchService.searchPhrase(words)
+                    .onEach{println("sending ${it.entity?.size}")}
                     .map{ServerSentEvent.builder(it).build()}
                     .catch{println(it)}
     @FlowPreview
