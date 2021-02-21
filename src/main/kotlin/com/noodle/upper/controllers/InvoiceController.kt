@@ -5,6 +5,7 @@ import com.noodle.upper.models.Tracked
 import com.noodle.upper.services.ListService
 import com.noodle.upper.services.SearchService
 import com.noodle.upper.services.UploadService
+import io.swagger.v3.oas.annotations.Operation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -22,13 +23,13 @@ class InvoiceController(
         @Autowired val searchService: SearchService
 ) {
     @FlowPreview
-    @Deprecated("Error prone", replaceWith = ReplaceWith("uploadAsync"))
-    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun upload(
-            @RequestPart("invoiceCsv") invoiceCsv: FilePart):
-            Flow<ServerSentEvent<Map<String, Float>>> =
-            uploadService.upload(invoiceCsv)
-                    .onEach{println(it)}
+    @PostMapping("/async", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun uploadAsync(
+            @RequestPart("invoiceCsv") invoiceCsv: FilePart): String =
+            uploadService.uploadDbCached(invoiceCsv)
+    @GetMapping("/async")
+    suspend fun uploadCompletion(@RequestParam("uuid") cacheUUID: String): Map<String, Int> =
+            uploadService.uploadProgress(cacheUUID).single()
     @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping("/{pageNumber}")
     fun list(
@@ -38,14 +39,6 @@ class InvoiceController(
             listService.listChunked(pageNumber, pageSize)
                     .onEach{println("sending ${it.entity?.size}")}
                     .map { ServerSentEvent.builder(it).build() }
-    @CrossOrigin(origins = ["http://localhost:3000"])
-    @GetMapping("/words")
-    suspend fun searchString(
-            @RequestParam words: String):
-            Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
-            searchService.searchWords(words)
-                    .map{ServerSentEvent.builder(it).build()}
-                    .catch{println(it)}
     @FlowPreview
     @ExperimentalCoroutinesApi
     @CrossOrigin(origins = ["http://localhost:3000"])
@@ -57,12 +50,30 @@ class InvoiceController(
                     .onEach{println("sending ${it.entity?.size}")}
                     .map{ServerSentEvent.builder(it).build()}
                     .catch{println(it)}
+    @CrossOrigin(origins = ["http://localhost:3000"])
+    @Operation(
+            summary = "Old search restful endpoint",
+            description = "queries the db using the given string using matchingAny criteria",
+            deprecated = true
+    )
+    @Deprecated("Error prone", ReplaceWith("searchService.searchWords(words).map { ServerSentEvent.builder(it).build() }.catch { println(it) }", "kotlinx.coroutines.flow.map", "org.springframework.http.codec.ServerSentEvent", "kotlinx.coroutines.flow.catch"))
+    @GetMapping("/words")
+    suspend fun searchString(
+            @RequestParam words: String):
+            Flow<ServerSentEvent<Tracked<List<Invoice>>>> =
+            searchService.searchWords(words)
+                    .map{ServerSentEvent.builder(it).build()}
+                    .catch{println(it)}
     @FlowPreview
-    @PostMapping("/async", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
-    fun uploadAsync(
-            @RequestPart("invoiceCsv") invoiceCsv: FilePart): String =
-            uploadService.uploadDbCached(invoiceCsv)
-    @GetMapping("/async")
-    suspend fun uploadCompletion(@RequestParam("uuid") cacheUUID: String): Map<String, Int> =
-            uploadService.uploadProgress(cacheUUID).single()
+    @Operation(
+            summary = "Old upload restful endpoint",
+            deprecated = true
+    )
+    @Deprecated("Error prone", ReplaceWith("uploadService.upload(invoiceCsv).onEach { println(it) }", "kotlinx.coroutines.flow.onEach"))
+    @PostMapping(consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun upload(
+            @RequestPart("invoiceCsv") invoiceCsv: FilePart):
+            Flow<ServerSentEvent<Map<String, Float>>> =
+            uploadService.upload(invoiceCsv)
+                    .onEach{println(it)}
 }
