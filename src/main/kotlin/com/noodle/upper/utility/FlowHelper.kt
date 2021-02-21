@@ -28,7 +28,7 @@ object FlowHelper {
                 list.clear()
             }
         }
-                .onCompletion { emit(list) }
+                .onCompletion { if (list.isNotEmpty()) emit(list) }
                 .collect()
     }
 
