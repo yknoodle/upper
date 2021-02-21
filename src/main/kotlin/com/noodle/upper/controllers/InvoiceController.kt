@@ -85,11 +85,11 @@ class InvoiceController(
                         responseCode = "200",
                         content = [
                             Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                    mediaType = MediaType.TEXT_EVENT_STREAM_VALUE,
                                     schema = Schema(implementation= Tracked::class,subTypes = [Invoice::class]),
                                     examples = [
                                         ExampleObject(
-                                                "{\"fetched\":1,\"total\":100,\"entity\":[{\"id\":\"603237e452843b36eee6fa27\",\"invoiceNo\":\"536378\",\"stockCode\":\"84519A\",\"description\":\"TOMATO CHARLIE+LOLA COASTER SET\",\"quantity\":6,\"invoiceDate\":\"12/1/2010 9:37\",\"unitPrice\":\"2.95\",\"customerId\":\"14688\",\"country\":\"United Kingdom\",\"score\":0.0,\"uploadId\":\"87a671ae-5bb4-4278-866e-a86b640536da\"}]}"
+                                                "data: {\"fetched\":1,\"total\":100,\"entity\":[{\"id\":\"603237e452843b36eee6fa27\",\"invoiceNo\":\"536378\",\"stockCode\":\"84519A\",\"description\":\"TOMATO CHARLIE+LOLA COASTER SET\",\"quantity\":6,\"invoiceDate\":\"12/1/2010 9:37\",\"unitPrice\":\"2.95\",\"customerId\":\"14688\",\"country\":\"United Kingdom\",\"score\":0.0,\"uploadId\":\"87a671ae-5bb4-4278-866e-a86b640536da\"}]}"
                                         )
                                     ])])])
     @CrossOrigin(origins = ["http://localhost:3000"])
