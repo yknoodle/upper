@@ -1,6 +1,7 @@
 # upper
 ## 🏗️ setup
 ### with docker
+❗ regrettably, i have not tested the docker script
 ```
 cd /{path-to-repo}/upper
 mvn package
