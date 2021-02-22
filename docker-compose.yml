@@ -1,0 +1,12 @@
+services:
+  api:
+    image: upper
+    ports:
+      - 8080:8080
+    links:
+      - database
+  database:
+    image: mongo:3.5.5
+    container_name: "upper-api-database"
+    ports:
+      - 27017:27017
