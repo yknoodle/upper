@@ -4,9 +4,9 @@ import com.noodle.upper.models.*
 import com.noodle.upper.repositories.ReactiveInvoiceRepository
 import com.noodle.upper.repositories.UploadRequestRepository
 import com.noodle.upper.services.Loader.load
-import com.noodle.upper.utility.FilePartHelper.asFlow
-import com.noodle.upper.utility.FlowHelper
-import com.noodle.upper.utility.FlowHelper.hotChunks
+import com.noodle.upper.utility.asFlow
+import com.noodle.upper.utility.hotChunks
+import com.noodle.upper.utility.track
 import com.noodle.upper.utility.uuid
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.GlobalScope
@@ -30,7 +30,7 @@ class UploadService(
         val saveFlow: Flow<String> = invoiceCsvFlow.hotChunks()
                 .flatMapConcat { invoiceRepository.insert(it).asFlow() }
                 .map { it.id ?: "unknown" }
-        FlowHelper.track({ saveFlow }, count)
+        track({ saveFlow }, count)
                 .distinctUntilChangedBy { it.base100() }
                 .onEach { emit(ServerSentEvent.builder(mapOf("uploaded" to it.completion())).build()) }
                 .collect()
