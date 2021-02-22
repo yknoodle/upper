@@ -5,7 +5,7 @@
 cd /{path-to-repo}/upper
 mvn package
 docker build -t upper
-docker -dp 8080:8080
+docker -dp 8080:8080 upper
 ```
 ### alternate
 ```
