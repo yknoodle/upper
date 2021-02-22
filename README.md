@@ -1,7 +1,6 @@
 # upper
 ## 🏗️ setup
 ### with docker
-❗ regrettably, i have not tested the docker script
 ```
 cd /{path-to-repo}/upper
 mvn package
@@ -11,7 +10,7 @@ docker -dp 8080:8080 upper
 ### alternate
 ```
 cd /{path-to-repo}/upper
-mvn clean install
+mvn package install
 java -jar target/upper-0.0.1-SNAPSHOT.jar
 ```
 ### postman tests
