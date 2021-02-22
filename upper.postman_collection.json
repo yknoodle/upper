@@ -1,0 +1,299 @@
+{
+	"info": {
+		"_postman_id": "98b6ef4d-c902-48ba-8c60-1a69775e12a5",
+		"name": "upper",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "queries",
+			"item": [
+				{
+					"name": "get-invoice-submission",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "523f810f-a6b9-4ffa-a8ab-1774a43dc8ac",
+								"exec": [
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "deae5aa4-0b58-4ea4-aa99-d6e414b97a88",
+								"exec": [
+									"const jsonData = pm.response.json()\r",
+									"if (jsonData.completed != true){\r",
+									"    console.log(jsonData.done, 'out of', jsonData.total, 'completed')\r",
+									"    setTimeout(function(){}, 20000)\r",
+									"    postman.setNextRequest('get-invoice-submission')\r",
+									"    pm.test(\"submission progress\", function () {\r",
+									"        pm.response.to.have.status(200)\r",
+									"    })\r",
+									"}\r",
+									"else postman.setNextRequest('get-invoice-page')"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "files",
+								"type": "text",
+								"value": "",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [],
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/invoice/submission?uuid={{uuid}}",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"invoice",
+								"submission"
+							],
+							"query": [
+								{
+									"key": "uuid",
+									"value": "{{uuid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-invoice-page",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "7b7f56a3-052c-4eba-8fc6-7b61908f2fd2",
+								"exec": [
+									"pm.test(\"call success\", function () {\r",
+									"    pm.response.to.have.status(200)\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {},
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "files",
+								"value": "",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/invoice/1?pageSize=1500",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"invoice",
+								"1"
+							],
+							"query": [
+								{
+									"key": "pageSize",
+									"value": "1500"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-invoice-search-term",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "958094da-7ead-4782-9724-fd746894e308",
+								"exec": [
+									"pm.test('search', function(){\r",
+									"    pm.response.to.have.status(200)\r",
+									"})\r",
+									"pm.test(\"Content-Type header is text/event-stream\", () => {\r",
+									"  pm.expect(pm.response.headers.get('Content-Type')).to.eql('text/event-stream;charset=UTF-8');\r",
+									"})\r",
+									"\r",
+									"pm.test(\"Body contains EventSource\",() => {\r",
+									"  pm.expect(pm.response.text()).to.include(\"data:{\");\r",
+									"})"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true,
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "files",
+								"type": "text",
+								"value": "",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "data: {\r\n    \"fetched\": 29,\r\n    \"total\": 0,\r\n    \"entity\": [\r\n        {\r\n            \"id\": null,\r\n            \"invoiceNo\": null,\r\n            \"stockCode\": null,\r\n            \"description\": null,\r\n            \"quantity\": 0,\r\n            \"invoiceDate\": null,\r\n            \"unitPrice\": null,\r\n            \"customerId\": null,\r\n            \"country\": null,\r\n            \"uploadId\": null\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411881\",\r\n            \"invoiceNo\": \"536372\",\r\n            \"stockCode\": \"22632\",\r\n            \"description\": \"HAND WARMER RED POLKA DOT\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:01\",\r\n            \"unitPrice\": \"1.85\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411882\",\r\n            \"invoiceNo\": \"536372\",\r\n            \"stockCode\": \"22633\",\r\n            \"description\": \"HAND WARMER UNION JACK\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:01\",\r\n            \"unitPrice\": \"1.85\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411883\",\r\n            \"invoiceNo\": \"536373\",\r\n            \"stockCode\": \"85123A\",\r\n            \"description\": \"WHITE HANGING HEART T-LIGHT HOLDER\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:02\",\r\n            \"unitPrice\": \"2.55\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411886\",\r\n            \"invoiceNo\": \"536373\",\r\n            \"stockCode\": \"20679\",\r\n            \"description\": \"EDWARDIAN PARASOL RED\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:02\",\r\n            \"unitPrice\": \"4.95\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411887\",\r\n            \"invoiceNo\": \"536373\",\r\n            \"stockCode\": \"37370\",\r\n            \"description\": \"RETRO COFFEE MUGS ASSORTED\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:02\",\r\n            \"unitPrice\": \"1.06\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411888\",\r\n            \"invoiceNo\": \"536373\",\r\n            \"stockCode\": \"21871\",\r\n            \"description\": \"SAVE THE PLANET MUG\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:02\",\r\n            \"unitPrice\": \"1.06\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b104441188b\",\r\n            \"invoiceNo\": \"536373\",\r\n            \"stockCode\": \"82483\",\r\n            \"description\": \"WOOD 2 DRAWER CABINET WHITE FINISH\",\r\n            \"quantity\": 2,\r\n            \"invoiceDate\": \"12/1/2010 9:02\",\r\n            \"unitPrice\": \"4.95\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b104441188d\",\r\n            \"invoiceNo\": \"536373\",\r\n            \"stockCode\": \"82482\",\r\n            \"description\": \"WOODEN PICTURE FRAME WHITE FINISH\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:02\",\r\n            \"unitPrice\": \"2.1\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411891\",\r\n            \"invoiceNo\": \"536373\",\r\n            \"stockCode\": \"22752\",\r\n            \"description\": \"SET 7 BABUSHKA NESTING BOXES\",\r\n            \"quantity\": 2,\r\n            \"invoiceDate\": \"12/1/2010 9:02\",\r\n            \"unitPrice\": \"7.65\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411894\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"85123A\",\r\n            \"description\": \"WHITE HANGING HEART T-LIGHT HOLDER\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"2.55\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411895\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"71053\",\r\n            \"description\": \"WHITE METAL LANTERN\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"3.39\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411896\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"84406B\",\r\n            \"description\": \"CREAM CUPID HEARTS COAT HANGER\",\r\n            \"quantity\": 8,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"2.75\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411897\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"20679\",\r\n            \"description\": \"EDWARDIAN PARASOL RED\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"4.95\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b1044411899\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"21871\",\r\n            \"description\": \"SAVE THE PLANET MUG\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"1.06\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b104441189a\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"21071\",\r\n            \"description\": \"VINTAGE BILLBOARD DRINK ME MUG\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"1.06\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b104441189b\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"21068\",\r\n            \"description\": \"VINTAGE BILLBOARD LOVE/HATE MUG\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"1.06\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b104441189c\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"82483\",\r\n            \"description\": \"WOOD 2 DRAWER CABINET WHITE FINISH\",\r\n            \"quantity\": 2,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"4.95\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b104441189e\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"82482\",\r\n            \"description\": \"WOODEN PICTURE FRAME WHITE FINISH\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"2.1\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118a1\",\r\n            \"invoiceNo\": \"536375\",\r\n            \"stockCode\": \"84029E\",\r\n            \"description\": \"RED WOOLLY HOTTIE WHITE HEART.\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"3.39\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118a4\",\r\n            \"invoiceNo\": \"536376\",\r\n            \"stockCode\": \"22114\",\r\n            \"description\": \"HOT WATER BOTTLE TEA AND SYMPATHY\",\r\n            \"quantity\": 48,\r\n            \"invoiceDate\": \"12/1/2010 9:32\",\r\n            \"unitPrice\": \"3.45\",\r\n            \"customerId\": \"15291\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118a7\",\r\n            \"invoiceNo\": \"536377\",\r\n            \"stockCode\": \"22633\",\r\n            \"description\": \"HAND WARMER UNION JACK\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:34\",\r\n            \"unitPrice\": \"1.85\",\r\n            \"customerId\": \"17850\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118aa\",\r\n            \"invoiceNo\": \"536378\",\r\n            \"stockCode\": \"21033\",\r\n            \"description\": \"JUMBO BAG CHARLIE AND LOLA TOYS\",\r\n            \"quantity\": 10,\r\n            \"invoiceDate\": \"12/1/2010 9:37\",\r\n            \"unitPrice\": \"2.95\",\r\n            \"customerId\": \"14688\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118ab\",\r\n            \"invoiceNo\": \"536378\",\r\n            \"stockCode\": \"20723\",\r\n            \"description\": \"STRAWBERRY CHARLOTTE BAG\",\r\n            \"quantity\": 10,\r\n            \"invoiceDate\": \"12/1/2010 9:37\",\r\n            \"unitPrice\": \"0.85\",\r\n            \"customerId\": \"14688\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118ad\",\r\n            \"invoiceNo\": \"536378\",\r\n            \"stockCode\": \"84997C\",\r\n            \"description\": \"BLUE 3 PIECE POLKADOT CUTLERY SET\",\r\n            \"quantity\": 6,\r\n            \"invoiceDate\": \"12/1/2010 9:37\",\r\n            \"unitPrice\": \"3.75\",\r\n            \"customerId\": \"14688\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118af\",\r\n            \"invoiceNo\": \"536378\",\r\n            \"stockCode\": \"20725\",\r\n            \"description\": \"LUNCH BAG RED RETROSPOT\",\r\n            \"quantity\": 10,\r\n            \"invoiceDate\": \"12/1/2010 9:37\",\r\n            \"unitPrice\": \"1.65\",\r\n            \"customerId\": \"14688\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118b3\",\r\n            \"invoiceNo\": \"536378\",\r\n            \"stockCode\": \"21975\",\r\n            \"description\": \"PACK OF 60 DINOSAUR CAKE CASES\",\r\n            \"quantity\": 24,\r\n            \"invoiceDate\": \"12/1/2010 9:37\",\r\n            \"unitPrice\": \"0.55\",\r\n            \"customerId\": \"14688\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118b4\",\r\n            \"invoiceNo\": \"536378\",\r\n            \"stockCode\": \"21977\",\r\n            \"description\": \"PACK OF 60 PINK PAISLEY CAKE CASES\",\r\n            \"quantity\": 24,\r\n            \"invoiceDate\": \"12/1/2010 9:37\",\r\n            \"unitPrice\": \"0.55\",\r\n            \"customerId\": \"14688\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118b5\",\r\n            \"invoiceNo\": \"536378\",\r\n            \"stockCode\": \"84991\",\r\n            \"description\": \"60 TEATIME FAIRY CAKE CASES\",\r\n            \"quantity\": 24,\r\n            \"invoiceDate\": \"12/1/2010 9:37\",\r\n            \"unitPrice\": \"0.55\",\r\n            \"customerId\": \"14688\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        },\r\n        {\r\n            \"id\": \"60314b55a7e14b10444118b7\",\r\n            \"invoiceNo\": \"536378\",\r\n            \"stockCode\": \"85183B\",\r\n            \"description\": \"CHARLIE & LOLA WASTEPAPER BIN FLORA\",\r\n            \"quantity\": 48,\r\n            \"invoiceDate\": \"12/1/2010 9:37\",\r\n            \"unitPrice\": \"1.25\",\r\n            \"customerId\": \"14688\",\r\n            \"country\": \"United Kingdom\",\r\n            \"uploadId\": \"743b8de8-43d5-4579-800d-d79d88c7eded\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/invoice?searchTerm=germany",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"invoice"
+							],
+							"query": [
+								{
+									"key": "searchTerm",
+									"value": "germany"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "post-invoice-submission",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "136db4cd-178c-4aa1-b540-0a5b638ff28f",
+						"exec": [
+							"var jsonData = pm.response.json();\r",
+							"pm.collectionVariables.set('uuid', jsonData.id)\r",
+							"pm.test(\"submission creation\", function () {\r",
+							"    pm.response.to.have.status(202)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "dd09bf91-4b02-43a7-9241-49a85c176732",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "files",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "invoiceCsv",
+							"type": "file",
+							"src": "/X:/Projects/Software/IntelliJProjects/upper/src/main/resources/data.csv"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/invoice/submission",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"invoice",
+						"submission"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"id": "b957534a-649c-4bda-ac79-c777eace0f1f",
+			"key": "variable_key",
+			"value": ""
+		},
+		{
+			"id": "b25b3824-926e-4af1-aa62-e0a449bfbb47",
+			"key": "uuid",
+			"value": ""
+		}
+	],
+	"protocolProfileBehavior": {}
+}
