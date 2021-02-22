@@ -1,17 +1,11 @@
 # upper
 ## 🏗️ setup
-### with docker
+### with docker only
 ```
-cd /{path-to-repo}/upper
+cd {clone-directory}/upper
 mvn package
-docker build -t upper
-docker -dp 8080:8080 upper
-```
-### alternate
-```
-cd /{path-to-repo}/upper
-mvn package install
-java -jar target/upper-0.0.1-SNAPSHOT.jar
+docker build -t upper .
+docker-compose up -d
 ```
 ### postman tests
 due to a multipart form required to be uploaded, i was not able to find a way to automate it
