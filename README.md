@@ -1,12 +1,12 @@
 # upper
 ## setup
-### setup (with docker)
+### with docker
 ```
 cd /{path-to-repo}/upper
 docker build -t upper
-docker -dp 8080:8080 upper
+docker -dp 8080:8080
 ```
-### setup
+### alternate
 ```
 cd /{path-to-repo}/upper
 mvn clean install
