@@ -1,12 +1,15 @@
 package com.noodle.upper
 
 import com.noodle.upper.utility.hotChunks
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.toList
+import com.noodle.upper.utility.unique
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
+/**
+ * @author damienho
+ * does not test the non-blocking nature of these functions
+ */
 class FlowHelperTests {
     @Test
     fun canTest() {
