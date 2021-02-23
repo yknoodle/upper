@@ -19,16 +19,14 @@ fun <T> Flow<T>.chunks(maxSize: Int = 5000): Flow<List<T>> = flow {
 }
 
 fun <T> Flow<T>.hotChunks(maxSize: Int = 5000): Flow<List<T>> = flow {
-    val list: MutableList<T> = mutableListOf()
+    var list: MutableList<T> = mutableListOf()
     onEach {
-        list += mutableListOf(it)
+        list.add(it)
         if (list.size == maxSize) {
             emit(list)
-            list.clear()
+            list = mutableListOf()
         }
-    }
-            .onCompletion { if (list.isNotEmpty()) emit(list) }
-            .collect()
+    }.onCompletion { if (list.isNotEmpty()) emit(list) } .collect()
 }
 
 fun <T, K> Flow<T>.unique(keySelector: (T) -> K): Flow<T> = flow {
