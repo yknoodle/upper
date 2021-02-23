@@ -3,9 +3,8 @@ package com.noodle.upper
 import com.noodle.upper.models.Tracked
 import com.noodle.upper.models.completion
 import com.noodle.upper.models.mergeTracked
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.single
+import com.noodle.upper.models.track
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 
@@ -24,5 +23,14 @@ class TrackedTests {
         ))
         val result: Tracked<List<Int>> = flowOfListOfTracked.mergeTracked().single()
         assert(result.entity?.size == 2)
+    }
+    @Test
+    fun canTrackFlow() = runBlocking {
+        val flowOfEntities: Flow<Int> = flowOf(1,2,3)
+        val result: List<Tracked<Int>> = track({ flowOfEntities }, flowOfEntities.count().toLong()).toList()
+        assert(result.size == flowOfEntities.count())
+        assert(result[0].fetched==1)
+        assert(result[1].fetched==2)
+        assert(result[0].total==3L)
     }
 }
