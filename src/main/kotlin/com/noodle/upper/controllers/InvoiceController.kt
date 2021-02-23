@@ -72,11 +72,19 @@ class InvoiceController(
                                                         "    \"completed\": false\n" +
                                                         "}"
                                         )
-                                    ])])])
+                                    ])]),
+                ApiResponse(
+                        description = "Uuid used did not yield any resource",
+                        responseCode = "404",
+                        content = [])
+            ])
     @GetMapping("/submission")
-    suspend fun progress(@RequestParam("uuid") cacheUUID: String):
-            ResponseEntity<SubmissionState> =
-            uploadService.uploadProgress(cacheUUID).map { ResponseEntity.ok(it) }.first()
+    suspend fun progress(@RequestParam("uuid") cacheUUID: String): ResponseEntity<SubmissionState?> {
+        val submissionState: SubmissionState? = uploadService.uploadProgress(cacheUUID).firstOrNull()
+        return if (submissionState!=null) ResponseEntity.ok(submissionState)
+        else ResponseEntity.notFound().build()
+
+    }
 
     @Operation(summary = "Get paged invoices",
             responses = [
