@@ -3,9 +3,9 @@ package com.noodle.upper.services
 import com.noodle.upper.models.Invoice
 import com.noodle.upper.models.Tracked
 import com.noodle.upper.models.mergeTracked
+import com.noodle.upper.models.track
 import com.noodle.upper.repositories.ReactiveInvoiceRepository
 import com.noodle.upper.utility.hotChunks
-import com.noodle.upper.utility.track
 import com.noodle.upper.utility.unique
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
