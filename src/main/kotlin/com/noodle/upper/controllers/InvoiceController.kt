@@ -2,10 +2,10 @@ package com.noodle.upper.controllers
 
 import com.noodle.upper.models.Invoice
 import com.noodle.upper.models.SubmissionRequest
+import com.noodle.upper.models.SubmissionState
 import com.noodle.upper.models.Tracked
 import com.noodle.upper.services.ListService
 import com.noodle.upper.services.SearchService
-import com.noodle.upper.services.SubmissionState
 import com.noodle.upper.services.UploadService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -72,11 +72,19 @@ class InvoiceController(
                                                         "    \"completed\": false\n" +
                                                         "}"
                                         )
-                                    ])])])
+                                    ])]),
+                ApiResponse(
+                        description = "Uuid used did not yield any resource",
+                        responseCode = "404",
+                        content = [])
+            ])
     @GetMapping("/submission")
-    suspend fun progress(@RequestParam("uuid") cacheUUID: String):
-            ResponseEntity<SubmissionState> =
-            uploadService.uploadProgress(cacheUUID).map { ResponseEntity.ok(it) }.first()
+    suspend fun progress(@RequestParam("uuid") cacheUUID: String): ResponseEntity<SubmissionState?> {
+        val submissionState: SubmissionState? = uploadService.uploadProgress(cacheUUID).firstOrNull()
+        return if (submissionState!=null) ResponseEntity.ok(submissionState)
+        else ResponseEntity.notFound().build()
+
+    }
 
     @Operation(summary = "Get paged invoices",
             responses = [

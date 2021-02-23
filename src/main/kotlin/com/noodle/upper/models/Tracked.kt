@@ -7,7 +7,6 @@ data class Tracked<T>(val fetched: Int, val total: Long, val entity: T?) {
 }
 
 fun <T> Tracked<T>.completion(): Float = this.fetched.toFloat()/this.total
-fun <T> Tracked<T>.base100(): Int = (completion()*100).toInt()
 fun <T> Flow<List<Tracked<T>>>.mergeTracked(): Flow<Tracked<List<T>>> {
     return this.map {
         Tracked(
@@ -16,4 +15,13 @@ fun <T> Flow<List<Tracked<T>>>.mergeTracked(): Flow<Tracked<List<T>>> {
                 it.fold(listOf<T>()) { acc, cur -> if (cur.entity != null) acc + (cur.entity) else acc }
         )
     }
+}
+fun <T> track(flowSupplier: () -> Flow<T>, expected: Long): Flow<Tracked<T>> {
+    var retrieved = 0
+    return flowSupplier()
+            .map {
+                val currentRetrieved = retrieved + 1
+                retrieved = currentRetrieved
+                Tracked(currentRetrieved, expected, it)
+            }
 }
