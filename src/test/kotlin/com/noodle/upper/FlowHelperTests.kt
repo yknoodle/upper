@@ -34,4 +34,13 @@ class FlowHelperTests {
                 .toList()
         assert(testString.length == chunked.flatMapIndexed { _, char -> char }.size)
     }
+    @Test
+    fun uniqueGivesUnique() = runBlocking {
+        val testString = "aabbcc"
+        val unique: List<Char> = testString.asSequence().asFlow()
+                .unique{it}
+                .onEach{println(it)}
+                .toList()
+        assert(unique.size == testString.asSequence().asFlow().distinctUntilChanged().count())
+    }
 }
