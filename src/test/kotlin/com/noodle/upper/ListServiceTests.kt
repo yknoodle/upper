@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -20,6 +21,10 @@ class ListServiceTests(
     @Test
     fun contextLoads(){
 
+    }
+    @BeforeEach
+    fun beforeEach(){
+        invoiceRepository.deleteAll().block()
     }
     @Test
     fun listIsPaged() = runBlocking {
