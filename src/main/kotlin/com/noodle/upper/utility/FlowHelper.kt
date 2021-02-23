@@ -1,17 +1,6 @@
 package com.noodle.upper.utility
 
-import com.noodle.upper.models.Tracked
 import kotlinx.coroutines.flow.*
-
-fun <T> track(flowSupplier: () -> Flow<T>, expected: Long): Flow<Tracked<T>> {
-    var retrieved = 0
-    return flowSupplier()
-            .map {
-                val currentRetrieved = retrieved + 1
-                retrieved = currentRetrieved
-                Tracked(currentRetrieved, expected, it)
-            }
-}
 
 /**
  * @deprecated not tested, may cause unexpected behaviour

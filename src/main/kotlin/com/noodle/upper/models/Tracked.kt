@@ -17,3 +17,12 @@ fun <T> Flow<List<Tracked<T>>>.mergeTracked(): Flow<Tracked<List<T>>> {
         )
     }
 }
+fun <T> track(flowSupplier: () -> Flow<T>, expected: Long): Flow<Tracked<T>> {
+    var retrieved = 0
+    return flowSupplier()
+            .map {
+                val currentRetrieved = retrieved + 1
+                retrieved = currentRetrieved
+                Tracked(currentRetrieved, expected, it)
+            }
+}
