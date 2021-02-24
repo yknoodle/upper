@@ -16,3 +16,6 @@ i also suggest using the same data.csv found from kaggle, as the upload is polle
 
 ## 💡 swagger-ui
 available at http://localhost:8080/swagger-ui.html
+
+- [ ] add boolean complete field to Tracked
+- [ ] add minimal ui deployment to demonstrate sse
