@@ -10,3 +10,5 @@ services:
     container_name: "upper-api-database"
     ports:
       - 27017:27017
+  ui:
+    image: demo-ui
