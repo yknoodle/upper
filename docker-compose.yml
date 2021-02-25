@@ -9,4 +9,4 @@ services:
     ports:
       - 27017:27017
   ui:
-    image: demo-ui
+    build: ./simple-ui
