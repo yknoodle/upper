@@ -18,5 +18,5 @@ i also suggest using the same data.csv found from kaggle, as the upload is polle
 available at http://localhost:8080/swagger-ui.html
 
 ## ⭐ todo
-- [ ] add boolean complete field to Tracked
+- [x] ~~add boolean complete field to Tracked~~ sse now sends a "complete" event upon completion
 - [ ] add minimal ui deployment to demonstrate sse

@@ -109,7 +109,8 @@ class InvoiceController(
             listService.listChunked(pageNumber, pageSize)
                     .onEach { println("sending ${it.entity?.size}") }
                     .map { ServerSentEvent.builder(it).build() }
-
+                    .onCompletion { emit(ServerSentEvent.builder<Tracked<List<Invoice>>>()
+                            .event("complete").build()) }
     @FlowPreview
     @ExperimentalCoroutinesApi
     @CrossOrigin(origins = ["http://localhost:3000"])
@@ -120,5 +121,6 @@ class InvoiceController(
             searchService.searchPhrase(words)
                     .onEach { println("sending ${it.entity?.size}") }
                     .map { ServerSentEvent.builder(it).build() }
-                    .catch { println(it) }
+                    .onCompletion { emit(ServerSentEvent.builder<Tracked<List<Invoice>>>()
+                            .event("complete").build()) }
 }
