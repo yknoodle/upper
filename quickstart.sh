@@ -1,3 +1,2 @@
-./mvnw clean package
-docker build -t upper .
+docker-compose build
 docker-compose up -d
