@@ -1,8 +1,6 @@
 services:
   api:
-    image: upper
-    ports:
-      - 8080:8080
+    build: .
     links:
       - database
   database:
