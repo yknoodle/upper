@@ -23,6 +23,7 @@ import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@CrossOrigin
 @RequestMapping("/invoice")
 class InvoiceController(
         @Autowired val listService: ListService,
@@ -100,7 +101,6 @@ class InvoiceController(
                                                 "data: {\"fetched\":1,\"total\":100,\"entity\":[{\"id\":\"603237e452843b36eee6fa27\",\"invoiceNo\":\"536378\",\"stockCode\":\"84519A\",\"description\":\"TOMATO CHARLIE+LOLA COASTER SET\",\"quantity\":6,\"invoiceDate\":\"12/1/2010 9:37\",\"unitPrice\":\"2.95\",\"customerId\":\"14688\",\"country\":\"United Kingdom\",\"score\":0.0,\"uploadId\":\"87a671ae-5bb4-4278-866e-a86b640536da\"}]}"
                                         )
                                     ])])])
-    @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping("/{pageNumber}")
     fun pages(
             @PathVariable("pageNumber") pageNumber: Int,
@@ -109,11 +109,10 @@ class InvoiceController(
             listService.listChunked(pageNumber, pageSize)
                     .onEach { println("sending ${it.entity?.size}") }
                     .map { ServerSentEvent.builder(it).build() }
-                    .onCompletion { emit(ServerSentEvent.builder<Tracked<List<Invoice>>>()
-                            .event("complete").build()) }
+                    .onCompletion { emit(ServerSentEvent.builder<Tracked<List<Invoice>>>(Tracked(0,0, emptyList()))
+                            .event(" complete").build()) }
     @FlowPreview
     @ExperimentalCoroutinesApi
-    @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping
     suspend fun search(
             @RequestParam("searchTerm") words: String):
