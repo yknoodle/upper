@@ -102,7 +102,6 @@ class InvoiceController(
                                         )
                                     ])])])
     @GetMapping("/{pageNumber}")
-    @ResponseBody
     fun pages(
             @PathVariable("pageNumber") pageNumber: Int,
             @RequestParam("pageSize") pageSize: Int):
