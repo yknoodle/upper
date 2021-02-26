@@ -3,9 +3,8 @@
 ### with docker only
 ```
 cd {clone-directory}/upper
-mvn package
-docker build -t upper .
-docker-compose up -d
+docker-compose build
+docker-compose up
 ```
 ### postman tests
 due to a multipart form required to be uploaded, i was not able to find a way to automate it.
@@ -19,4 +18,4 @@ available at http://localhost:8080/swagger-ui.html
 
 ## ⭐ todo
 - [x] ~~add boolean complete field to Tracked~~ sse now sends a "complete" event upon completion
-- [x] add minimal ui deployment to demonstrate sse
+- [x] ~~add minimal ui deployment to demonstrate sse~~
