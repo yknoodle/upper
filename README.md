@@ -19,4 +19,4 @@ available at http://localhost:8080/swagger-ui.html
 
 ## ⭐ todo
 - [x] ~~add boolean complete field to Tracked~~ sse now sends a "complete" event upon completion
-- [ ] add minimal ui deployment to demonstrate sse
+- [x] add minimal ui deployment to demonstrate sse
