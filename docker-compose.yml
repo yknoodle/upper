@@ -3,6 +3,8 @@ services:
     build: .
     links:
       - database
+    ports:
+      - 8080:8080
   database:
     image: mongo:3.5.5
     container_name: "upper-api-database"
